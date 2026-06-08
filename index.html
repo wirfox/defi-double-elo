@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Défi Double — TC Morgins</title>
+  <style>
+    /* ============================================================
+       Variables & Reset
+    ============================================================ */
+    :root {
+      --primary:       #E8720C;
+      --primary-dark:  #C45C00;
+      --primary-light: #FFF4EC;
+      --primary-100:   #FFE4CC;
+      --navy:          #1E293B;
+      --navy-dark:     #0F172A;
+      --text:          #334155;
+      --text-light:    #64748B;
+      --text-dark:     #0F172A;
+      --border:        #E2E8F0;
+      --bg:            #F8FAFC;
+      --white:         #FFFFFF;
+      --green:         #16A34A;
+      --green-bg:      #DCFCE7;
+      --red:           #DC2626;
+      --red-bg:        #FEE2E2;
+      --yellow:        #92400E;
+      --yellow-bg:     #FEF3C7;
+      --shadow-sm:     0 1px 2px rgba(0,0,0,0.05);
+      --shadow:        0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:     0 4px 6px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-lg:     0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+      --radius:        8px;
+      --radius-lg:     12px;
+      --radius-xl:     16px;
+      --font:          -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --transition:    all 0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+    input { font-family: inherit; }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .header-logo {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .header-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .header-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      line-height: 1.2;
+    }
+    .header-sub {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      font-weight: 400;
+    }
+    .header-date {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      font-weight: 500;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .header-date svg {
+      width: 13px; height: 13px;
+      stroke: var(--text-light); fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       TABS
+    ============================================================ */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
+    }
+    .tabs-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      display: flex;
+      width: 100%;
+    }
+    .tab-btn {
+      padding: 0.85rem 1.25rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-light);
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    .tab-btn svg {
+      width: 15px; height: 15px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .tab-btn:hover { color: var(--text-dark); }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* ============================================================
+       MAIN CONTENT
+    ============================================================ */
+    main { flex: 1; padding: 1.5rem 1.25rem 2rem; }
+    .content-wrap { max-width: 720px; margin: 0 auto; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ============================================================
+       CARD
+    ============================================================ */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--primary);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ============================================================
+       FORM
+    ============================================================ */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 400px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .team-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      font-size: 0.65rem;
+      font-weight: 500;
+    }
+    .badge-a { background: var(--primary-100); color: var(--primary-dark); }
+    .badge-b { background: #E0F2FE; color: #0369A1; }
+
+    .form-input {
+      padding: 0.65rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      background: var(--white);
+      transition: var(--transition);
+      width: 100%;
+      -moz-appearance: textfield;
+    }
+    .form-input::-webkit-inner-spin-button,
+    .form-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(232,114,12,0.13);
+    }
+    .form-input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
+    .form-input::placeholder { color: var(--text-light); font-weight: 400; }
+
+    /* Quick-select team dropdown hint */
+    .team-select-hint {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      margin-top: 0.2rem;
+    }
+
+    /* Radio group */
+    .radio-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .radio-label:hover { border-color: var(--primary); color: var(--primary); }
+    .radio-label input[type="radio"] { display: none; }
+    .radio-dot { display: none; }
+    .radio-label:has(input[type="radio"]:checked) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 500;
+    }
+
+    .form-divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+    /* Calculate button */
+    .btn-calc {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-lg);
+      font-size: 0.97rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-calc svg {
+      width: 18px; height: 18px;
+      stroke: white; fill: none;
+      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* ============================================================
+       RESULTS
+    ============================================================ */
+    #results { display: none; }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    @media (max-width: 360px) { .result-grid { grid-template-columns: 1fr; } }
+
+    .result-team {
+      padding: 1.1rem;
+      border-radius: var(--radius-lg);
+      border: 1.5px solid var(--border);
+      text-align: center;
+    }
+    .result-team.win  { background: var(--green-bg);    border-color: #86EFAC;          }
+    .result-team.lose { background: var(--primary-light); border-color: var(--primary-100); }
+
+    .result-team-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+    }
+    .result-team.win  .result-team-name { color: var(--green);       }
+    .result-team.lose .result-team-name { color: var(--primary-dark); }
+
+    .result-pts {
+      font-size: 2rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+    .result-team.win  .result-pts { color: var(--green);        }
+    .result-team.lose .result-pts { color: var(--primary-dark); }
+
+    .result-pts-label {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      margin-top: 0.25rem;
+    }
+    .result-pts-sub {
+      font-size: 0.68rem;
+      color: var(--text-light);
+      margin-top: 0.3rem;
+      padding-top: 0.3rem;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      line-height: 1.35;
+    }
+
+    /* Banners */
+    .banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius-lg);
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-top: 0.75rem;
+      line-height: 1.45;
+    }
+    .banner-yellow { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #FDE68A; }
+    .banner-blue   { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .banner-icon { font-size: 1rem; flex-shrink: 0; line-height: 1.5; }
+    .banner strong { font-weight: 500; }
+
+    /* ============================================================
+       TEAMS TABLE
+    ============================================================ */
+    .screen-header { margin-bottom: 1.25rem; }
+    .screen-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 0.2rem;
+    }
+    .screen-sub { font-size: 0.82rem; color: var(--text-light); }
+
+    /* Liste des équipes — sobre, blanc & orange */
+    .teams-list {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .teams-list-header {
+      display: grid;
+      grid-template-columns: 44px 1fr 70px;
+      align-items: center;
+      padding: 0.8rem 1.2rem;
+      border-bottom: 2px solid var(--primary);
+      background: var(--white);
+    }
+    .teams-list-header > div {
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--primary);
+    }
+    .teams-list-header .col-rank { text-align: center; }
+    .teams-list-header .col-cote { text-align: center; }
+
+    .team-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 70px;
+      align-items: center;
+      padding: 0.75rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+    }
+    .team-row:last-child { border-bottom: none; }
+    .team-row:hover { background: var(--primary-light); }
+
+    .team-row .col-rank {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-light);
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+    }
+    .team-row .col-name {
+      font-size: 0.94rem;
+      color: var(--text-dark);
+      font-weight: 500;
+      line-height: 1.35;
+      min-width: 0;
+    }
+    .team-row .col-cote {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    @media (max-width: 440px) {
+      .teams-list-header,
+      .team-row {
+        grid-template-columns: 32px 1fr 56px;
+        padding: 0.7rem 0.95rem;
+      }
+      .team-row .col-name { font-size: 0.88rem; }
+      .team-row .col-cote { font-size: 1.05rem; }
+      .team-row .col-rank { font-size: 0.82rem; }
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+    .footer-inner { max-width: 720px; margin: 0 auto; }
+    .footer-rules {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      line-height: 1.8;
+    }
+    .footer-sep { margin: 0 0.35rem; opacity: 0.4; }
+    .footer-credit { font-size: 0.68rem; color: #CBD5E1; margin-top: 0.35rem; }
+
+    /* ============================================================
+       Responsive
+    ============================================================ */
+    @media (max-width: 500px) {
+      .card { padding: 1.1rem; }
+      .header-date { display: none; }
+      .result-pts { font-size: 1.65rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="header-logo">
+          <img src="logo_tcm.png" alt="Tennis Club Morgins">
+        </div>
+        <div>
+          <div class="header-title">Défi Double</div>
+          <div class="header-sub">TC Morgins</div>
+        </div>
+      </div>
+      <div class="header-date">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        1er juin – 15 nov. 2026
+      </div>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs">
+    <div class="tabs-inner">
+      <button class="tab-btn active" onclick="switchTab('calc')" id="tab-calc">
+        <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="6" x2="12" y2="6"/></svg>
+        Calculatrice
+      </button>
+      <button class="tab-btn" onclick="switchTab('teams')" id="tab-teams">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Équipes
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main>
+    <div class="content-wrap">
+
+      <!-- ====== ÉCRAN CALCULATRICE ====== -->
+      <div class="screen active" id="screen-calc">
+
+        <div class="card">
+          <div class="card-title">Simulateur de match</div>
+
+          <!-- Cotes -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="team-badge badge-a">A</span>
+                Cote Équipe A
+              </label>
+              <input type="number" class="form-input" id="coteA"
+                     placeholder="ex. 14" min="1" max="20" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <span class="team-badge badge-b">B</span>
+                Cote Équipe B
+              </label>
+              <input type="number" class="form-input" id="coteB"
+                     placeholder="ex. 6" min="1" max="20" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="form-divider"></div>
+
+          <!-- Vainqueur -->
+          <div class="form-group" style="margin-bottom: 1.1rem;">
+            <label class="form-label" style="margin-bottom: 0.45rem;">Qui a gagné ?</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="winner" value="A">
+                <span class="radio-dot"></span>
+                <span class="team-badge badge-a" style="width:15px;height:15px;font-size:0.6rem;">A</span>
+                Équipe A
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="winner" value="B">
+                <span class="radio-dot"></span>
+                <span class="team-badge badge-b" style="width:15px;height:15px;font-size:0.6rem;">B</span>
+                Équipe B
+              </label>
+            </div>
+          </div>
+
+          <!-- 3 sets -->
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" style="margin-bottom: 0.45rem;">Match en 3 sets ?</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="sets" value="yes">
+                <span class="radio-dot"></span>
+                Oui — défaite 2-1
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="sets" value="no" checked>
+                <span class="radio-dot"></span>
+                Non — 2-0
+              </label>
+            </div>
+          </div>
+
+          <button class="btn-calc" onclick="calculate()">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Calculer les points
+          </button>
+        </div>
+
+        <!-- Résultat -->
+        <div class="card" id="results">
+          <div class="card-title">Résultat</div>
+          <div class="result-grid" id="resultGrid"></div>
+          <div id="banners"></div>
+        </div>
+
+      </div><!-- /screen-calc -->
+
+      <!-- ====== ÉCRAN ÉQUIPES ====== -->
+      <div class="screen" id="screen-teams">
+        <div class="screen-header">
+          <div class="screen-title">Équipes du tournoi</div>
+          <div class="screen-sub" id="teamsSub">Cotes fixes de départ — Tournoi 2026</div>
+        </div>
+
+        <div class="teams-list">
+          <div class="teams-list-header">
+            <div class="col-rank">N°</div>
+            <div class="col-name">Équipe</div>
+            <div class="col-cote">Cote</div>
+          </div>
+          <div id="teamsBody">
+            <!-- Rempli par JS -->
+          </div>
+        </div>
+      </div><!-- /screen-teams -->
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-rules">
+        Gagnant&nbsp;=&nbsp;+cote adverse
+        <span class="footer-sep">·</span>
+        Perdant&nbsp;=&nbsp;+1/2/3&nbsp;pts (selon cote)
+        <span class="footer-sep">·</span>
+        3&nbsp;sets&nbsp;=&nbsp;+1&nbsp;pt bonus pour le perdant
+      </div>
+      <div class="footer-credit">TC Morgins — Défi Double 2026</div>
+    </div>
+  </footer>
+
+  <script>
+    /* ============================================================
+       DONNÉES — ÉQUIPES (liste mise à jour juin 2026)
+    ============================================================ */
+    const TEAMS = [
+      { name: 'Louise Fellay / Franco Gerville',             cote: 20 },
+      { name: 'Clare Marshall / Bret Marshall',              cote: 18 },
+      { name: 'Olivier Coulombe / Michele Francesco',        cote: 16 },
+      { name: 'Leity Thiongane / Mahé Di Marco',             cote: 14 },
+      { name: 'Corinne R-Collins / Charly Collins',          cote: 14 },
+      { name: 'Maël Gabin / Arnaud Gabin',                   cote: 12 },
+      { name: 'Delphine De Selliers / Nadia Thiongane',      cote: 12 },
+      { name: 'Estelle Rosser / Julien Rosser',              cote: 10 },
+      { name: 'Famille Ducrey',                              cote: 10 },
+      { name: 'Irène Caillet-Bois / Marloes Achermann',      cote: 10 },
+      { name: 'Rachel Suaire / Ruth Martenet',               cote:  8 },
+      { name: 'Sidney Leparmentier / Christiane Renevier',   cote:  8 },
+      { name: 'Hélène Liberati / Eric Derivaz',              cote:  8 },
+      { name: 'Laure Galan / Magali Di Marco',               cote:  6 },
+      { name: 'Frank Peillex / Julina Peillex',              cote:  6 },
+      { name: 'Famille Berra',                               cote:  6 },
+      { name: 'Famille Locher',                              cote:  6 },
+      { name: 'Stéphanie Monay / Pierre Raboud',             cote:  6 },
+      { name: 'Johann Cretton / Virginie Gabin',             cote:  6 },
+      { name: 'Raphaël Avitabile / Alexia Avitabile',        cote:  4 },
+      { name: 'Julie Dubos / Cynthia Granger (Aurélie)',     cote:  2 },
+      { name: 'Alexis Ulmann / Raphaël Grillet',             cote:  2 },
+    ];
+
+    /* ============================================================
+       NAVIGATION ONGLETS
+    ============================================================ */
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.getElementById('screen-' + tab).classList.add('active');
+    }
+
+    /* ============================================================
+       LISTE DES ÉQUIPES — propre, blanc & orange
+    ============================================================ */
+    (function renderTeams() {
+      // Sous-titre dynamique
+      document.getElementById('teamsSub').textContent =
+        `${TEAMS.length} équipes · Cotes fixes de départ · Tournoi 2026`;
+
+      // Liste
+      const body = document.getElementById('teamsBody');
+      let html = '';
+      TEAMS.forEach((t, i) => {
+        html += `
+          <div class="team-row">
+            <div class="col-rank">${i + 1}</div>
+            <div class="col-name">${t.name}</div>
+            <div class="col-cote">${t.cote}</div>
+          </div>`;
+      });
+      body.innerHTML = html;
+    })();
+
+    /* ============================================================
+       CALCUL DES POINTS — Règles 2026 (Nadia)
+       ─────────────────────────────────────────
+       GAGNANT  : +cote de l'adversaire
+       PERDANT  : bonus participation selon cote adverse
+                  · adv. cote inférieure  → +1
+                  · adv. cote égale       → +2
+                  · adv. cote supérieure  → +3
+                + si défaite en 3 sets : +1 pt fixe
+    ============================================================ */
+    function calculate() {
+      const coteA = parseFloat(document.getElementById('coteA').value);
+      const coteB = parseFloat(document.getElementById('coteB').value);
+      const winnerEl = document.querySelector('input[name="winner"]:checked');
+      const setsEl   = document.querySelector('input[name="sets"]:checked');
+
+      // Validation
+      const inputA = document.getElementById('coteA');
+      const inputB = document.getElementById('coteB');
+      inputA.classList.remove('error');
+      inputB.classList.remove('error');
+
+      let valid = true;
+      if (!coteA || coteA <= 0) { inputA.classList.add('error'); inputA.focus(); valid = false; }
+      if (!coteB || coteB <= 0) { inputB.classList.add('error'); if (valid) inputB.focus(); valid = false; }
+      if (!valid) return;
+      if (!winnerEl) {
+        alert('Veuillez sélectionner le vainqueur.');
+        return;
+      }
+
+      const winner   = winnerEl.value;           // 'A' ou 'B'
+      const threeSet = setsEl?.value === 'yes';
+
+      // Cotes selon vainqueur/perdant
+      const coteW = winner === 'A' ? coteA : coteB;   // cote du gagnant
+      const coteL = winner === 'A' ? coteB : coteA;   // cote du perdant
+
+      // ----- GAGNANT -----
+      const gainW = coteL;                            // prend la cote de l'adversaire
+
+      // ----- PERDANT -----
+      // Bonus participation : selon la cote du gagnant comparée à celle du perdant
+      // (du point de vue du perdant : "qui ai-je affronté ?")
+      let participation;
+      let comparaison; // texte pour le bandeau
+      if      (coteW >  coteL) { participation = 3; comparaison = 'adversaire plus fort';   }
+      else if (coteW === coteL) { participation = 2; comparaison = 'cotes égales';           }
+      else                      { participation = 1; comparaison = 'adversaire plus faible'; }
+
+      // Bonus 3 sets : +1 pt fixe
+      const bonus3sets = threeSet ? 1 : 0;
+
+      const gainL = participation + bonus3sets;
+
+      // Deltas finaux par équipe
+      const deltaA = (winner === 'A') ? gainW : gainL;
+      const deltaB = (winner === 'B') ? gainW : gainL;
+
+      // ---- Affichage résultats ----
+      const subWinner = `cote adverse (${coteL} pt${coteL > 1 ? 's' : ''})`;
+      const subLoser  = threeSet
+        ? `participation +${participation} · 3 sets +${bonus3sets}`
+        : `participation +${participation}`;
+
+      document.getElementById('resultGrid').innerHTML =
+        teamResult('A', deltaA, winner === 'A', winner === 'A' ? subWinner : subLoser) +
+        teamResult('B', deltaB, winner === 'B', winner === 'B' ? subWinner : subLoser);
+
+      // ---- Bandeaux explicatifs ----
+      let html = '';
+      const loserTeam = winner === 'A' ? 'B' : 'A';
+
+      html += `<div class="banner banner-yellow">
+        <span class="banner-icon">🎾</span>
+        <div><strong>Équipe ${loserTeam} (perdante) : +${participation}&nbsp;pt${participation > 1 ? 's' : ''} de participation</strong>
+        <br><span style="opacity:.75">${comparaison}</span></div>
+      </div>`;
+
+      if (threeSet) {
+        html += `<div class="banner banner-blue">
+          <span class="banner-icon">🥈</span>
+          <div><strong>Match en 3&nbsp;sets :</strong> +${bonus3sets}&nbsp;pt${bonus3sets > 1 ? 's' : ''} bonus pour l'équipe ${loserTeam}</div>
+        </div>`;
+      }
+      document.getElementById('banners').innerHTML = html;
+
+      // Afficher la carte résultat
+      const res = document.getElementById('results');
+      res.style.display = 'block';
+      setTimeout(() => res.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
+
+    function teamResult(team, delta, isWinner, sub) {
+      const cls   = isWinner ? 'win' : 'lose';
+      const emoji = isWinner ? '🏆' : '🥈';
+      const label = isWinner ? 'Vainqueur' : 'Perdant';
+      const bCls  = team === 'A' ? 'badge-a' : 'badge-b';
+      return `
+        <div class="result-team ${cls}">
+          <div class="result-team-name">
+            <span class="team-badge ${bCls}" style="width:15px;height:15px;font-size:0.6rem;">${team}</span>
+            Équipe ${team}
+          </div>
+          <div class="result-pts">+${delta}</div>
+          <div class="result-pts-label">${emoji} ${label}</div>
+          <div class="result-pts-sub">${sub}</div>
+        </div>`;
+    }
+  </script>
+
+</body>
+</html>
